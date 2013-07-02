@@ -4,11 +4,13 @@ module['exports'] = function (options, callback) {
 
   var $ = this.$;
 
-  $('.user > .name').html(options.name);
-  $('.user > .email').html(options.email);
+  $('.user > .name').html('Bob');
+  $('.user > .email').html('bob@bob.com');
 
   this.layout({
+    layout: this.parent.testLayout,
     layoutOptions: options,
+    selector: '#test',
     html: $.html()
   }, callback);
 };

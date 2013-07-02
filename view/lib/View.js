@@ -4,7 +4,6 @@ var path = require('path'),
     fs = require('fs');
 
 var query = require('./query'),
-    layout = require('./layout'),
     render = require('./render');
 
 var View = function (options) {
@@ -204,35 +203,22 @@ View.prototype._loadAsync = function (cb) {
 
 };
 
+// export query
+View.prototype.query = query;
+
+// export layout
+View.prototype.layout = require('./layout');
+
 View.prototype.present = function(options, callback) {
 
+  // TODO: turn self into this
+  // load query into self
   var self = this;
+  self.$ = query(self.template);
 
-  // if this is not a layout, do perform layout
-  if (self.name !== "layout") {
-    // load query
-    self.$ = query(self.template);
-    layout.call(self, self, options, function(err, result) {
-      if (err)
-        throw err;
-
-      // update template and reload query
-      self.$ = query(result);
-
-      // if we have presenter, use it,
-      // otherwise fallback to default presenter
-      return (self.presenter || render).call(self, options, callback);
-    });
-  } else {
-    // load query
-    self.$ = query(self.template);
-
-    // if we have presenter, use it,
-    // otherwise fallback to default presenter
-    return (self.presenter || render).call(self, options, function(err, result) {
-      return callback(err, result);
-    });
-  }
+  // if we have presenter, use it,
+  // otherwise fallback to default presenter
+  return (self.presenter || render).call(self, options, callback);
 };
 
 //

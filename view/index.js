@@ -1,12 +1,14 @@
 var resource = require('resource'),
     view = resource.define('view'),
-    View = require('./lib/View');
+    View = require('./lib/View'),
+    errors = require('./lib/errors');
 
 //
 // Export the View class for convenience
 //
 exports.View = View;
 view.View = View;
+view.errors = errors;
 
 view.schema.description = "for managing views";
 

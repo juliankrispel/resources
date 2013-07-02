@@ -14,7 +14,11 @@ test("start a view server", function(t) {
   http = resource.use('http');
 
   resource.http.start(function(err, _server) {
+<<<<<<< HEAD
+    t.ok(!err, 'no error');
+=======
     t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.ok(_server, 'server is returned');
     t.ok(resource.http.app, 'resource.http.app is defined');
     server = _server;
@@ -24,7 +28,11 @@ test("start a view server", function(t) {
 
 test("load a view/layout with http and view.middle", function(t) {
   view.create( { path: __dirname + "/view17" } , function(err, _view) {
+<<<<<<< HEAD
+    t.ok(!err, 'no error');
+=======
     t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.ok(_view, 'view is returned');
 
     http.app.use(view.middle({view: _view}));
@@ -32,8 +40,12 @@ test("load a view/layout with http and view.middle", function(t) {
     supertest(server)
       .get('/root')
       .end(function(err, res){
+<<<<<<< HEAD
+        t.ok(!err, 'no error');
+=======
         if (err) throw err;
         t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
         t.equal(res.text, '<h1>big</h1>\n<div id="main"><div class="user">\n\t<div class="name">Bob</div>\n\t<div class="email">bob@bob.com</div>\n</div>\n</div>',
           'response returns correct result');
         t.end();
@@ -41,6 +53,11 @@ test("load a view/layout with http and view.middle", function(t) {
   });
 });
 
+<<<<<<< HEAD
+test("load nested views/layouts with http and view.middle", function(t) {
+  view.create( { path: __dirname + "/view19" } , function(err, _view) {
+    t.ok(!err, 'no error');
+=======
 test("load nested view/layout with http and view.middle", function(t) {
   view.create( { path: __dirname + "/view18" } , function(err, _view) {
     t.error(err, 'no error');
@@ -74,6 +91,7 @@ test("load nested view/layout with http and view.middle", function(t) {
 test("load nested views/layouts with http and view.middle", function(t) {
   view.create( { path: __dirname + "/view19" } , function(err, _view) {
     t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.ok(_view, 'view is returned');
 
     http.app.use(view.middle({view: _view}));
@@ -81,8 +99,12 @@ test("load nested views/layouts with http and view.middle", function(t) {
     supertest(server) // first test index2
       .get('/index2')
       .end(function(err, res){
+<<<<<<< HEAD
+        t.ok(!err, 'no error');
+=======
         if (err) throw err;
         t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
         t.equal(res.text,
           '<h1>big</h1>\n<h2>nothing</h2>\n<div id="main"><div class="user">\n\t<div class="name">Bob</div>\n\t<div class="email">bob@bob.com</div>\n</div>\n</div>',
           'response returns correct result');
@@ -91,8 +113,12 @@ test("load nested views/layouts with http and view.middle", function(t) {
     supertest(server) // then test table2
       .get('/table2')
       .end(function(err, res){
+<<<<<<< HEAD
+        t.ok(!err, 'no error');
+=======
         if (err) throw err;
         t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
         t.equal(res.text,
           '<h1>big</h1>\n<h2>nothing</h2>\n<div id="main"><div class="table">steve</div>\n</div>',
           'response returns correct result');
@@ -101,8 +127,12 @@ test("load nested views/layouts with http and view.middle", function(t) {
     supertest(server) // then test test2/index
       .get('/test2/index')
       .end(function(err, res){
+<<<<<<< HEAD
+        t.ok(!err, 'no error');
+=======
         if (err) throw err;
         t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
         t.equal(res.text,
           '<h1>nothing</h1>\n<h2>big</h2>\n<div id="main"><div class="user">\n\t<div class="name">Bob</div>\n\t<div class="email">bob@bob.com</div>\n</div>\n</div>',
           'response returns correct result');
@@ -111,8 +141,48 @@ test("load nested views/layouts with http and view.middle", function(t) {
     supertest(server) // then test test2/table
       .get('/test2/table')
       .end(function(err, res){
+<<<<<<< HEAD
+        t.ok(!err, 'no error');
+        t.equal(res.text,
+          '<h1>nothing</h1>\n<h2>big</h2>\n<div id="main"><div class="table">steve</div>\n</div>',
+          'response returns correct result');
+        t.end();
+    });
+  });
+});
+
+test("load nested view/layout with http and view.middle with prefix", function(t) {
+  view.create( { path: __dirname + "/view18" } , function(err, _view) {
+    t.ok(!err, 'no error');
+    t.ok(_view, 'view is returned');
+
+    http.app.use(view.middle({view: _view, prefix: '/prefix/'}));
+
+    supertest(server) // make sure we can't access original index
+      .get('/index')
+      .end(function(err, res){
+        t.ok(!err, 'no error');
+        t.equal(res.text, 'Cannot GET /index');
+    });
+
+    supertest(server) // now test /prefix/index
+      .get('/prefix/index')
+      .end(function(err, res){
+        t.ok(!err, 'no error');
+        t.equal(res.text,
+          '<h1>big</h1>\n<h2>nothing</h2>\n<div id="main"><div class="user">\n\t<div class="name">Bob</div>\n\t<div class="email">bob@bob.com</div>\n</div>\n</div>',
+          'response returns correct result');
+    });
+
+    // TODO: does this test look for the expected behaviour?
+    supertest(server) // then test /prefix/test/table
+      .get('/prefix/test/table')
+      .end(function(err, res){
+        t.ok(!err, 'no error');
+=======
         if (err) throw err;
         t.error(err, 'no error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
         t.equal(res.text,
           '<h1>nothing</h1>\n<h2>big</h2>\n<div id="main"><div class="table">steve</div>\n</div>',
           'response returns correct result');

@@ -7,5 +7,8 @@ module['exports'] = function (options, callback) {
   $('.user > .name').html(options.name);
   $('.user > .email').html(options.email);
 
-  callback(null, $.html());
+  this.layout({
+    layoutOptions: options,
+    html: $.html()
+  }, callback);
 };

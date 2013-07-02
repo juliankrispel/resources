@@ -7,7 +7,10 @@ module['exports'] = function (options, callback) {
   $('.user > .name').html('Bob');
   $('.user > .email').html('bob@bob.com');
 
-  $('h1').html('big');
+  this.parent.layout.template = '<h1>big</h1><div id="main"></div>';
 
-  callback(null, $.html());
+  this.layout({
+    layoutOptions: options,
+    html: $.html()
+  }, callback);
 };

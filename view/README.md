@@ -2,7 +2,10 @@
 
 for managing views
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
 ## API
 
 #### [properties](#view-properties)

@@ -20,7 +20,11 @@ test('connect()', function (t) {
       {'connection': 'close','content-type': 'application/json'});
   // run test
   bitcoin.connect({}, function(err, conn) {
+<<<<<<< HEAD
+    t.ok(!err, 'bitcoin client should not error');
+=======
     t.error(err, 'bitcoin client should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.type(conn, 'object', 'bitcoin connection should be object');
     t.type(conn.id, 'string', 'bitcoin connectId should be string');
     t.type(conn.client, 'object', 'bitcoin client should be object');
@@ -41,7 +45,11 @@ test('getNewAddress()', function (t) {
   // run test
   var connectId = bitcoin.connectId();
   bitcoin.getNewAddress(connectId, [], function (err, address) {
+<<<<<<< HEAD
+    t.ok(!err, 'getNewAddress() should not error');
+=======
     t.error(err, 'getNewAddress() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.type(address, 'string', 'address should be string');
     t.end();
   });
@@ -59,7 +67,11 @@ test('getBalance()', function (t) {
   // run test
   var connectId = bitcoin.connectId();
   bitcoin.getBalance(connectId, [], function (err, balance) {
+<<<<<<< HEAD
+    t.ok(!err, 'getBalance() should not error');
+=======
     t.error(err, 'getBalance() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.type(balance, 'number', 'balance should be number');
     t.end();
   });
@@ -83,12 +95,20 @@ test('getBalance(account)', function (t) {
   // run test
   var connectId = bitcoin.connectId();
   bitcoin.getBalance(connectId, ['big_test_address1'], function (err, balance) {
+<<<<<<< HEAD
+    t.ok(!err, 'getBalance() should not error');
+=======
     t.error(err, 'getBalance() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     t.type(balance, 'number', 'balance should be number');
     t.equal(balance, 0.1, 'balance of "big_test_address2" should equal 0.1');
 
     bitcoin.getBalance(connectId, ['big_test_address2'], function (err, balance) {
+<<<<<<< HEAD
+      t.ok(!err, 'getBalance() should not error');
+=======
       t.error(err, 'getBalance() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
       t.type(balance, 'number', 'balance should be number');
       t.equal(balance, 0.0, 'balance of "big_test_address2" should equal 0.0');
       t.end();
@@ -139,31 +159,55 @@ test('accounts', function (t) {
   var connectId = bitcoin.connectId();
   var acct = 'big_test_address3';
   bitcoin.getNewAddress(connectId, [acct], function (err, address) {
+<<<<<<< HEAD
+    t.ok(!err, 'getNewAddress(account) should not error');
+    t.type(address, 'string', 'address should be string');
+
+    bitcoin.getAccount(connectId, [address], function (err, account) {
+      t.ok(!err, 'getAccount(address) should not error');
+=======
     t.error(err, 'getNewAddress(account) should not error');
     t.type(address, 'string', 'address should be string');
 
     bitcoin.getAccount(connectId, [address], function (err, account) {
       t.error(err, 'getAccount(address) should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
       t.type(account, 'string', 'account should be string');
       t.equal(account, acct, 'account should be correct');
 
       bitcoin.getAddressesByAccount(connectId, [account], function(err, addresses) {
+<<<<<<< HEAD
+        t.ok(!err, 'getAddressesByAccount(account) should not error');
+=======
         t.error(err, 'getAddressesByAccount(account) should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
         t.type(addresses, 'object', 'addresses should be object');
         t.equal(addresses.length, 1, 'there should only be one address');
         t.equal(addresses[0], address, 'address should be correct');
 
         bitcoin.getNewAddress(connectId, [acct], function (err, address2) {
+<<<<<<< HEAD
+          t.ok(!err, 'getNewAddress(account) should not error');
+          t.type(address2, 'string', 'address should be string');
+
+          bitcoin.getAccount(connectId, [address], function (err, account2) {
+            t.ok(!err, 'getAccount(address) should not error');
+=======
           t.error(err, 'getNewAddress(account) should not error');
           t.type(address2, 'string', 'address should be string');
 
           bitcoin.getAccount(connectId, [address], function (err, account2) {
             t.error(err, 'getAccount(address) should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
             t.type(account2, 'string', 'account should be string');
             t.equal(account2, acct, 'account should be correct');
 
             bitcoin.getAddressesByAccount(connectId, [account], function(err, addresses2) {
+<<<<<<< HEAD
+              t.ok(!err, 'getAddressesByAccount(account) should not error');
+=======
               t.error(err, 'getAddressesByAccount(account) should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
               t.type(addresses2, 'object', 'addresses should be object');
               t.equal(addresses2.length, 2, 'there should be two addresses');
               t.ok(!(addresses2[0] == address) ^ !(addresses2[1] == address), 'address should be correct');
@@ -190,7 +234,11 @@ test('setTxFee(amount)', function(t) {
   var connectId = bitcoin.connectId();
   var txFee = 0.0005;
   bitcoin.setTxFee(connectId, [txFee], function (err, result) {
+<<<<<<< HEAD
+    t.ok(!err, 'setTxFee(amount) should not error');
+=======
     t.error(err, 'setTxFee(amount) should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
     //console.log(result);
     t.type(result, 'boolean', 'result should be boolean');
     t.end();
@@ -246,9 +294,15 @@ test('send', function(t) {
   var toSpend = 0.01;
   var txFee = 0.0005;
   bitcoin.getBalance(connectId, [fromAcct], function(err, origFromBalance) {
+<<<<<<< HEAD
+    t.ok(!err, 'getBalance() should not error');
+    bitcoin.getNewAddress(connectId, [toAcct], function(err, toAddr) {
+      t.ok(!err, 'getNewAddress() should not error');
+=======
     t.error(err, 'getBalance() should not error');
     bitcoin.getNewAddress(connectId, [toAcct], function(err, toAddr) {
       t.error(err, 'getNewAddress() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
       //console.log(origFromBalance, toSpend, txFee);
       var many = {};
       many[toAddr] = toSpend;
@@ -256,11 +310,19 @@ test('send', function(t) {
       console.log(many);
       bitcoin.sendMany(connectId, [fromAcct, many], function (err, txid) {
         console.log(err);
+<<<<<<< HEAD
+        t.ok(!err, 'sendMany() should not error');
+        t.type(txid, 'string', 'transaction id should be string');
+        bitcoin.getTransaction(connectId, [txid], function(err, tx) {
+          console.log(err);
+          t.ok(!err, 'getTransaction() should not error');
+=======
         t.error(err, 'sendMany() should not error');
         t.type(txid, 'string', 'transaction id should be string');
         bitcoin.getTransaction(connectId, [txid], function(err, tx) {
           console.log(err);
           t.error(err, 'getTransaction() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
           t.equal(tx.txid, txid, 'txid of returned tx should be equal to lookup txid');
           // transaction checks
           //t.equal(tx.amount, toSpend, 'tx amount should be correct');
@@ -277,9 +339,15 @@ test('send', function(t) {
           t.equal(tx.details[0].fee, -txFee, 'first fee in tx should be txFee');
           */
           bitcoin.getBalance(connectId, [fromAcct, 0], function(err, newFromBalance) {
+<<<<<<< HEAD
+            t.ok(!err, 'getBalance() should not error');
+            bitcoin.getBalance(connectId, [toAcct, 0], function(err, newToBalance) {
+              t.ok(!err, 'getBalance() should not error');
+=======
             t.error(err, 'getBalance() should not error');
             bitcoin.getBalance(connectId, [toAcct, 0], function(err, newToBalance) {
               t.error(err, 'getBalance() should not error');
+>>>>>>> 70d031b965d51534463465b7783c9edcdee144fb
               t.equal(newFromBalance, origFromBalance - toSpend - txFee,
                 'account sending coins should have correctly reduced balance');
               t.equal(newToBalance, toSpend,
