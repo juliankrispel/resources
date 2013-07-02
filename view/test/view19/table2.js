@@ -6,6 +6,9 @@ module['exports'] = function (options, callback) {
 
 	$('.table').html('steve');
 
-		callback(null, $.html());
+		this.layout({
+    layoutOptions: options,
+    html: $.html()
+  }, callback);
 };
 

@@ -15,7 +15,6 @@ module['exports'] = function (options) {
       }
       var _view = options.view;
       var parts = require('url').parse(req.url).pathname.replace(options.prefix, '').split('/');
-      parts.shift();
       parts.forEach(function(part) {
         if(part.length > 0 && typeof _view !== 'undefined') {
           _view = _view[part];
@@ -30,7 +29,7 @@ module['exports'] = function (options) {
       _view.present({
         request: req,
         response: res,
-        data: req.big.params
+        data: req.resource.params
         }, function (err, rendered) {
         res.end(rendered);
       });
