@@ -10,11 +10,21 @@ module['exports'] = function (options) {
       // If the view was mounted with a prefix and that prefix was not found in the incoming url,
       // do not attempt to use that view
       //
-      if (options.prefix.length > 0 && req.url.search(options.prefix) === -1) {
+      var quote = function (str) {
+        return str.replace(/(?=[\/\\^$*+?.()|{}[\]])/g, "\\");
+      }
+      // clean given prefix of any start or end slashes
+      var prefix = options.prefix.replace(/\/$/, "").replace(/^\//, "");
+      if (prefix.length > 0 && req.url.search("^/?" + quote(prefix)) === -1) {
         return next();
       }
       var _view = options.view;
-      var parts = require('url').parse(req.url).pathname.replace(options.prefix, '').split('/');
+
+      // remove prefix and break path into separate parts
+      var path = require('url').parse(req.url).pathname;
+      var pathWithoutPrefix = path.replace(prefix, '');
+      var parts = pathWithoutPrefix.split('/');
+
       parts.forEach(function(part) {
         if(part.length > 0 && typeof _view !== 'undefined') {
           _view = _view[part];

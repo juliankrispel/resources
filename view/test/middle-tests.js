@@ -128,7 +128,34 @@ test("load nested view/layout with http and view.middle with prefix", function(t
   });
 });
 
-// TODO: make a test that breaks prefix by having a url with /.../prefix/...
+test("load view/layout with pathname that collides with prefix", function(t) {
+  view.create( { path: __dirname + "/view9" } , function(err, _view) {
+    t.ok(!err, 'no error');
+    t.ok(_view, 'view is returned');
+
+    http.app.use(view.middle({view: _view, prefix: '/prefix/'})).as("view");
+
+    supertest(server) // make sure we can't access original path
+      .get('/test/prefix/root')
+      .end(function(err, res){
+        t.ok(!err, 'no error');
+        t.equal(res.text, 'Cannot GET /test/prefix/root',
+          'cant access original path');
+    });
+
+    supertest(server) // test /prefix/test/prefix/root
+      .get('/prefix/test/prefix/root')
+      .end(function(err, res){
+        t.ok(!err, 'no error');
+        t.equal(res.text,
+          '<h1>big</h1>\n<div id="main"><div class="user">\n\t<div class="name">Bob</div>\n\t<div class="email">bob@bob.com</div>\n</div>\n</div>',
+          'response returns correct result');
+
+        http.app.remove("view");
+        t.end();
+    });
+  });
+});
 
 test("stop a view server", function(t) {
   server.close(function(err) {
