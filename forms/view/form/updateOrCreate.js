@@ -17,7 +17,11 @@ module['exports'] = function (options, callback) {
     // if id is given, get object and use it to
     // set any undefined properties in options.data
     r.get(options.id, function(err, _r) {
-      if (err) {
+      // if we can't find the resource, continue as normal
+      if (err && (err.message === options.id + " not found")) {
+        return finish();
+      }
+      else if (err) {
         options.err = err;
         return self.layout({
           layout: self.parent.parent.layout,
@@ -26,13 +30,13 @@ module['exports'] = function (options, callback) {
           html: ""
         }, callback);
       }
-
-      // use current instance to default options.data
-      Object.keys(_r).forEach(function(key) {
-        options.data[key] = options.data[key] || _r[key];
-      });
-
-      return finish();
+      else {
+        // use current instance to default options.data
+        Object.keys(_r).forEach(function(key) {
+          options.data[key] = options.data[key] || _r[key];
+        });
+        return finish();
+      }
     });
   } else {
     return finish();

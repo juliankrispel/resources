@@ -1,96 +1,136 @@
-var resource = require('resource');
+var resource = require('resource'),
+    async = require('async');
+require('js-object-clone');
 
 module['exports'] = function (options, callback) {
 
   options = options || {};
   var $ = this.$,
     self = this,
-    output = '',
-    method = resource[options.resource].methods[options.method],
-    entity = options.resource || 'unknown',
-    desc;
+    r = resource.resources[options.resource],
+    rMethod = r.methods[options.method];
 
-  desc = method.schema.description || '';
+  var domWithLayout = function(error) {
+    options.err = error;
+    self.layout({
+      layout: self.parent.parent.layout,
+      layoutOptions: options,
+      selector: "#forms-main",
+      html: $.html()
+    }, callback);
+  };
 
-  if (desc.length === 0) {
-    desc = options.method;
-  }
+  // legend should show method description or method name
+  $('legend').html(rMethod.schema.description || options.method || '');
 
-  $('#submit').attr('value', options.method);
-  $('legend').html(desc);
+  // submit button should show method name
+  $('input[type="submit"]').attr('value', options.method);
 
-  if (typeof options.data !== 'undefined') {
+  // if the action is to post, submit the form
+  if (options.action === 'post') {
     var cb = function (err, result) {
+
+      // if there are errors, remove results and display errors on the forms
       if (err) {
-        if (err.errors) {
-          err.errors.forEach(function(e){
-            $('.result').append(JSON.stringify(e));
-          });
-        } else {
-          $('.result').append(err.message);
-        }
-        return showForm(options.data, err.errors);
-      } else {
-        $('form').remove();
-        $('.result').html(JSON.stringify(result, true, 2));
-        return callback(null, $.html());
+        $('.results').remove();
+        return showForm(options.data, err);
       }
-    }
-    return resource.invoke(method, options.data, cb);
+
+      $('form').remove();
+      $('.result').html(JSON.stringify(result, true, 2));
+      // if we were given a redirect, use it
+      if (options.redirect) {
+        // fill the redirect template
+        var redirect = require('mustache').to_html(options.redirect, options.data);
+        options.response.redirect(redirect);
+      }
+      return domWithLayout();
+    };
+    // submit the data
+    return resource.invoke(rMethod, options.data, cb);
+
+  // otherwise if the action is not post,
   } else {
+    // show the form
     $('.results').remove();
-    showForm();
+    showForm(options.data);
   }
 
-  function showForm (data, errors) {
+  function showForm (data, error) {
     data = data || {};
-    if(typeof method.schema.properties !== 'undefined') {
-      var _props = method.schema.properties || {};
+    var errors = (error) ? error.errors : {};
+    if(typeof rMethod.schema.properties !== 'undefined') {
+      var props = rMethod.schema.properties || {};
 
-      if (method.schema.properties.options && typeof method.schema.properties.options.properties !== 'undefined') {
-        _props = method.schema.properties.options.properties;
+      // if this rMethod has an argument of "options",
+      // use it as properties
+      if (rMethod.schema.properties.options &&
+        typeof rMethod.schema.properties.options.properties !== 'undefined') {
+        props = rMethod.schema.properties.options.properties;
       }
 
-      $('h1').html(entity + ' - create');
-      $('input[type="submit"]').attr('value', options.method);
+      // clone props so we don't modify schema directly
+      props = Object.clone(props);
 
-      var cont = function(err, result) {
-        if (result) {
-          output += result;
-        }
-        if(arr.length === 0) {
-          $('.inputs').html(output);
-          return callback(null, $.html())
-        }
-        var property = arr.pop();
-        var input = {};
-        for(var p in _props[property]) {
-          input[p] = _props[property][p];
-        };
-        input.name = property;
-        for(var e in errors) {
-          if (errors[e].property === input.name) {
-            input.error = errors[e];
+      // remove callback from properties
+      if (props.callback) {
+        delete props.callback;
+      }
+
+      //
+      // for each property key (in series),
+      // append the property control to the dom
+      //
+      async.eachSeries(Object.keys(props),
+        function(property, callback) {
+
+          // make a shallow clone of this property as the control
+          var control = {};
+          for(var p in props[property]) {
+            control[p] = props[property][p];
           }
-        }
-        if(typeof data[input.name] !== 'undefined') {
-          input.value = data[input.name];
-        } else {
-          input.value = input.default || '';
-        }
-        options.control = input;
-        self.parent.inputs.index.present(options, function(err, str){
-          cont(err, str);
+
+          // label the control
+          control.name = property;
+
+          // if we have errors, add them to the control
+          for(var e in errors) {
+            if (errors[e].property === control.name) {
+              control.error = errors[e];
+            }
+          }
+
+          // if the data we were given has this property, add it to control.
+          if(typeof data[property] !== 'undefined') {
+            control.value = data[property];
+          }
+          // else, use control's default (if it has one) or the empty string
+          else {
+            control.value = control.default || '';
+          }
+
+          // add the control to options
+          options.control = control;
+
+          // call inputs presenter, which will handle delegation appropriately
+          self.parent.inputs.index.present(options, function(err, result){
+            if (err) { return callback(err); }
+            $('.inputs').append(result);
+            return callback(null);
+          });
+        },
+
+
+        function(err) {
+          if (err) { return domWithLayout(err); }
+          // return the dom
+          return domWithLayout(error);
         });
-      };
 
-      var arr = Object.keys(_props);
-      arr.reverse();
-      cont();
-
+    // no properties remain, return the rendered form
     } else {
-      callback(null, $.html());
+      return domWithLayout(error);
     }
   }
 
-}
+};
