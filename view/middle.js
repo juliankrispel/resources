@@ -1,5 +1,7 @@
 // view connect middleware
 
+var resource = require('resource');
+
 module['exports'] = function (options) {
 
   options.prefix = options.prefix || '';
@@ -36,12 +38,48 @@ module['exports'] = function (options) {
       if(typeof _view === "undefined") {
         return next();
       }
-      _view.present({
-        request: req,
-        response: res,
-        data: req.resource.params
-        }, function (err, rendered) {
-        res.end(rendered);
+
+      // create function to finish after _view.present
+      var finish = function(err, html) {
+        if (resource.layout) {
+
+          // if there is a layout, view the layout too
+          if (resource.layout) {
+            _view.layout({
+              layout: resource.layout.view.layout,
+              layoutOptions: {
+                request: req,
+                response: res,
+                data: req.resource.params,
+                err: err
+              },
+              html: html
+            }, function(err, result) {
+              if (err) { return next(err); }
+              res.end(result);
+            });
+          } else {
+            if (err) { return next(err); }
+            res.end(html);
+          }
+        }
+      };
+
+      // use a domain to catch errors
+      var d = require('domain').create();
+
+      // safety net for uncaught errors
+      d.on('error', function(err) {
+        return finish(err, "");
+      });
+
+      // present the target view
+      d.run(function() {
+        _view.present({
+          request: req,
+          response: res,
+          data: req.resource.params
+        }, finish);
       });
     } else {
       //
