@@ -7,7 +7,6 @@ var query = require('./query'),
     render = require('./render');
 
 var View = function (options) {
-
   var self = this;
 
   options = options || {};
@@ -42,11 +41,7 @@ var View = function (options) {
     self.parent = options.parent;
   }
 
-  if (typeof options === "string") {
-    this.load(options);
-  }
-
-  return this;
+  return self;
 };
 
 //
@@ -76,54 +71,71 @@ View.prototype.load = function (viewPath, cb) {
   return self._loadAsync(cb);
 };
 
-View.prototype._loadAsync = function (cb) {
+View.prototype.getSubView = function(viewPath) {
+  // synchronously get subview given path
 
-  var self = this,
-  viewPath = self.viewPath,
-  callbacks = 0;
+  var _view = this,
+      parts = viewPath.split('/');
 
-  var root = self.viewPath;
-
-  fs.readdir(root, function(err, dir) {
-    if (err) {
-      return cb(err);
+  // goes as deep as possible, doesn't error if nothing deeper exist
+  // TODO make it error or do something useful
+  parts.forEach(function(part) {
+    if(part.length > 0 && typeof _view !== 'undefined') {
+      _view = _view[part];
     }
-    dir.forEach(function(p) {
-      fs.stat(root + '/' + p, function(err, stat) {
-        if (stat.isDirectory()){
-          delegate('dir', p);
-        } else {
-          delegate('file', p);
-        }
+  });
+
+  return _view;
+};
+
+View.prototype._loadAsync = function (callback) {
+
+  var self = this;
+
+  (function() {
+    var walk = require("walk");
+
+    var walker = walk.walk(self.viewPath, {});
+
+    walker.on("directory", function(root, dirStats, next) {
+      //console.log(root, dirStats);
+      //
+      // create a new subview
+      //
+      var rootSub = path.relative(self.viewPath, root),
+          _view = self.getSubView(rootSub),
+          subViewName = dirStats.name;
+
+      _view[subViewName] = new View({
+        name: subViewName,
+        path: root,
+        parent: _view
       });
+
+      next();
     });
-   });
 
-  function delegate (type, _path) {
-    var ext = self.detect(_path),
-        subViewName;
-
-    subViewName = _path;
-
-    if (type === "file") {
-
-      subViewName = _path.replace(ext, '');
-
+    walker.on("file", function(root, fileStats, next) {
+      //console.log(root, fileStats);
       //
-      // increase the callback count
+      // create a new subview
       //
-      callbacks++;
+      var rootSub = path.relative(self.viewPath, root),
+          _view = self.getSubView(rootSub),
+          name = fileStats.name,
+          ext = path.extname(name),
+          subViewName = name.replace(ext, '');
 
       // determine if file is template or presenter ( presenters end in .js and are node modules )
       if (ext === ".js") {
-        callbacks--;
+        next();
         // don't do anything
       } else {
 
         //
         // load the file as the current template
         //
-        fs.readFile(root + '/' + _path, function(err, result) {
+        fs.readFile(root + '/' + name, function(err, result) {
           if (err) {
             throw err;
           }
@@ -137,7 +149,7 @@ View.prototype._loadAsync = function (cb) {
           //
           // get presenter, if it exists
           //
-          var presenterPath = root +  '/' + _path.replace(ext, '.js');
+          var presenterPath = root +  '/' + name.replace(ext, '.js');
 
           //
           // Determine if presenter file exists first before attempting to require it
@@ -156,50 +168,23 @@ View.prototype._loadAsync = function (cb) {
             presenter = require(presenterPath);
           }
 
-          self[subViewName] = new View({
+          _view[subViewName] = new View({
             name: subViewName,
             template: template,
             presenter: presenter,
-            parent: self
+            parent: _view
           });
 
-          callbacks--;
-          if(callbacks === 0) {
-            cb(null, self);
-          }
-
+          next();
         });
       }
-    }
+    });
 
-    if(type === "dir") {
-      //
-      // create a new subview
-      //
-      self[subViewName] = new View({
-        name: subViewName,
-        path: root + '/' + _path,
-        parent: self
-      });
-      //
-      // increase callback count
-      //
-      callbacks ++;
-      //
-      // load view
-      //
-      self[subViewName].load(function() {
-        //
-        // decrease callback count
-        //
-        callbacks--;
-        if(callbacks === 0){
-          cb(null, self);
-        }
-      });
-    }
-  }
-  return;
+    walker.on('end', function() {
+      return callback(null, self);
+    });
+
+  })();
 
 };
 
