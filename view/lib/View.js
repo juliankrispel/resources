@@ -12,7 +12,7 @@ var View = function (options) {
 
   options = options || {};
 
-  self.viewPath = options.path || process.cwd();
+  self.viewPath = options.path;
 
   if (options.path) {
     self.viewPath      = options.path;
@@ -29,7 +29,8 @@ var View = function (options) {
   if (options.template) {
     self.template = options.template;
     //
-    // Remark: If we have been passed in a template as a string, the querySelectorAll context needs to be updated
+    // Remark: If we have been passed in a template as a string,
+    // the querySelectorAll context needs to be updated
     //
     self.$ = query(self.template);
   }
@@ -42,11 +43,7 @@ var View = function (options) {
     self.parent = options.parent;
   }
 
-  if (typeof options === "string") {
-    this.load(options);
-  }
-
-  return this;
+  return self;
 };
 
 //

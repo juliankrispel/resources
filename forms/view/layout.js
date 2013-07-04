@@ -2,13 +2,13 @@ module['exports'] = function (options, callback) {
 
   var resource = require('resource'),
       html = require('html-lang'),
+      self = this;
+      $ = self.$,
       rName = options.resource = options.resource,
       rMethod = options.method,
       display = options.display,
       data = options.data = options.data || {},
-      r = resource.use(rName),
-      $ = this.$,
-      self = this;
+      r = resource.use(rName);
 
   //
   // side nav
@@ -48,7 +48,7 @@ module['exports'] = function (options, callback) {
 
   if (resource.layout) {
     return self.layout({
-      layout: resource.layout.view.layout,
+      layout: resource.layout.view,
       layoutOptions: options,
       html: $.html()
     }, callback);

@@ -9,9 +9,10 @@ module['exports'] = function (options) {
   return function (req, res, next) {
     if (options.view) {
       //
-      // If the view was mounted with a prefix and that prefix was not found in the incoming url,
-      // do not attempt to use that view
+      // If the view was mounted with a prefix and that prefix was 
+      // not found in the incoming url, do not attempt to use that view
       //
+      // helper function for 'quoting' / 'escaping' regex strings
       var quote = function (str) {
         return str.replace(/(?=[\/\\^$*+?.()|{}[\]])/g, "\\");
       }
@@ -48,7 +49,7 @@ module['exports'] = function (options) {
           // if there is a layout, view the layout too
           if (resource.layout) {
             _view.layout({
-              layout: resource.layout.view.layout,
+              layout: resource.layout.view,
               layoutOptions: {
                 request: req,
                 response: res,

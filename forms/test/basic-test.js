@@ -1,6 +1,7 @@
 var wd = require('wd')
   , assert = require('assert')
   , resource = require('resource')
+  , view = resource.use('view')
   , forms = resource.use('forms')
   , creature = resource.use('creature')
   , _creature
@@ -29,6 +30,37 @@ var deepEqual = function(actual, expected) {
 }
 
 var tap = require("tap");
+
+//
+// add layout that provides bootstrap
+//
+tap.test('use the layout', function (t) {
+  var layout = resource.define('layout');
+  t.ok(layout, "layout is defined");
+  view.create({
+    template:
+      /*jshint multistr: true */
+      '\
+      <html>\
+      <head>\
+        <title>big forms test</title>\
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">\
+      </head>\
+      <body>\
+        <div id="main"><div>\
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>\
+      </body>\
+      </html>\
+      '
+    }, function(err, _view) {
+      t.ok(!err, "no error");
+      t.ok(_view, "view is defined");
+      layout.view = _view;
+      resource.resources.layout = layout;
+      resource.layout = layout;
+      t.end();
+    });
+});
 
 tap.test('start the forms resource', function (t) {
 
@@ -61,7 +93,7 @@ tap.test("get / with no creatures", function (t) {
 
   browser.get(baseUrl, function (err, html) {
     browser.title(function(err, title) {
-      t.equal(title, '', 'title is empty');
+      t.equal(title, 'big forms test', 'title is correct');
       browser.elementByCssSelector('.result', function(err, result) {
         t.ok(!err, 'no error');
         browser.text(result, function(err, resultText) {
@@ -108,7 +140,6 @@ tap.test("get /creature/all", function (t) {
 
   browser.get(baseUrl, function (err, result) {
     browser.title(function(err, title) {
-      t.equal(title, '', 'title is empty');
       browser.elementByClassName('result', function(err, result) {
         t.ok(!err, 'no error');
         browser.text(result, function(err, resultText) {
