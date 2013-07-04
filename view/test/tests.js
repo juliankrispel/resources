@@ -9,7 +9,7 @@ test("start a view", function (t) {
     t.ok(_view, 'view is returned');
 
     // check default properties
-    t.equal(/.*\/view/.test(_view.viewPath), true, "default viewPath is '.*/view'");
+    t.equal(/.\/view/.test(_view.viewPath), true, "default viewPath is './view'");
     t.equal(_view.name, '', "default name is ''");
     t.equal(_view.template, undefined, "no template is loaded when no path is given");
     t.equal(_view.presenter, undefined, "no presenter is loaded when no path is given");

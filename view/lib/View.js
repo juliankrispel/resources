@@ -11,7 +11,7 @@ var View = function (options) {
 
   options = options || {};
 
-  self.viewPath = options.path;
+  self.viewPath = options.path || "./view";
 
   if (options.path) {
     self.viewPath      = options.path;

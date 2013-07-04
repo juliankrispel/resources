@@ -34,34 +34,31 @@ module['exports'] = function (options) {
       }
 
       if(typeof _view === "undefined" ||
-        typeof _view.template === "undefined" ||
-        typeof _view.presenter === "undefined") {
+        (typeof _view.template === "undefined" &&
+        typeof _view.presenter === "undefined")) {
         return next();
       }
 
       // create function to finish after _view.present
       var finish = function(err, html) {
+        // if there is a layout, view the layout too
         if (resource.layout) {
-
-          // if there is a layout, view the layout too
-          if (resource.layout) {
-            _view.layout({
-              layout: resource.layout.view,
-              layoutOptions: {
-                request: req,
-                response: res,
-                data: req.resource.params,
-                err: err
-              },
-              html: html
-            }, function(err, result) {
-              if (err) { return next(err); }
-              res.end(result);
-            });
-          } else {
+          _view.layout({
+            layout: resource.layout.view,
+            layoutOptions: {
+              request: req,
+              response: res,
+              data: req.resource.params,
+              err: err
+            },
+            html: html
+          }, function(err, result) {
             if (err) { return next(err); }
-            res.end(html);
-          }
+            res.end(result);
+          });
+        } else {
+          if (err) { return next(err); }
+          res.end(html);
         }
       };
 
