@@ -26,16 +26,13 @@ module['exports'] = function (options) {
       // remove prefix and break path into separate parts
       var path = require('url').parse(req.url).pathname;
       var pathWithoutPrefix = path.replace(prefix, '');
-      var parts = pathWithoutPrefix.split('/');
 
-      parts.forEach(function(part) {
-        if(part.length > 0 && typeof _view !== 'undefined') {
-          _view = _view[part];
-        }
-      });
+      _view = _view.getSubView(pathWithoutPrefix);
+
       if (_view && _view['index']) {
         _view = _view['index'];
       }
+
       if(typeof _view === "undefined" ||
         typeof _view.template === "undefined" ||
         typeof _view.presenter === "undefined") {
