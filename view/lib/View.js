@@ -28,9 +28,10 @@ var View = function (options) {
   if (options.template) {
     self.template = options.template;
     //
-    // Remark: If we have been passed in a template as a string, the querySelectorAll context needs to be updated
+    // Remark: If we have been passed in a template as a string,
+    // the querySelectorAll context needs to be updated
     //
-    self.$ = query(self.template);
+    self.$ = self.querySelector = query(self.template);
   }
 
   if (options.presenter) {
@@ -199,7 +200,7 @@ View.prototype.present = function(options, callback) {
   // TODO: turn self into this
   // load query into self
   var self = this;
-  self.$ = query(self.template);
+  self.$ = self.querySelector = query(self.template);
 
   // if we have presenter, use it,
   // otherwise fallback to default presenter
