@@ -35,7 +35,9 @@ module['exports'] = function (options) {
       if (_view && _view['index']) {
         _view = _view['index'];
       }
-      if(typeof _view === "undefined") {
+      if(typeof _view === "undefined" ||
+        typeof _view.template === "undefined" ||
+        typeof _view.presenter === "undefined") {
         return next();
       }
 
