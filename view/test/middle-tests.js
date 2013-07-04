@@ -179,9 +179,6 @@ test("load nested view/layout with http and view.middle with prefix", function(t
       .end(function(err, res){
         t.ok(!err, 'no error');
         t.equal(res.text, "Cannot GET /prefix/test/");
-
-        http.app.remove("view");
-        t.end();
     });
 
     supertest(server) // then test /prefix/test/table
