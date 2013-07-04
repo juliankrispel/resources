@@ -12,7 +12,8 @@ function start(options, callback) {
 
   var handle = function(options, next) {
     options = options || {};
-    options.resource = options.resource || 'space';
+    // TODO move these two defaults to config
+    options.resource = options.resource || 'creature';
     options.method = options.method || 'all';
 
     // if the resource is not in use
@@ -74,7 +75,18 @@ function start(options, callback) {
     }, next);
   });
 
-  http.app.before('router').use(app).as('forms');
+  if(!http.app) {
+    http.start(options, next);
+  }
+  else {
+    next();
+  }
+
+  function next(err) {
+    console.log("app",http.app);
+    http.app.before('router').use(app).as('forms');
+    return callback(null, app);
+  }
 }
 forms.method('start', start, {
   description: "starts forms",
