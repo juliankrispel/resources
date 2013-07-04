@@ -6,6 +6,7 @@
       "resource": "0.4.x"
     },
     "devDependencies": {
+      "wd": "*",
       "tap": "*",
       "supertest": "*",
       "nock": "*"
